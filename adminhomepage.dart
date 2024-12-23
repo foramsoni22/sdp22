@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'fpage.dart';
 void main() {
   runApp(MyApp());
 }
@@ -8,12 +9,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My App',
+      title: 'Admin Dashboard',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.teal,
-        textTheme: TextTheme(
-          headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.bold), // Use headlineMedium
-        ),
+        fontFamily: 'Montserrat',
       ),
       home: AdminHomePage(),
     );
@@ -24,153 +24,169 @@ class AdminHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Admin Home Page'),
-        backgroundColor: Colors.teal, // Set AppBar background color to teal
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              // Implement logout functionality
-            },
-          ),
-        ],
-      ),
+      appBar: _customAppBar(),
       drawer: AdminDrawer(),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background.jpg'), // Your background image
-            fit: BoxFit.cover,
-          ),
+          color: Colors.grey.shade100,
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Admin Dashboard',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white), // Use headlineMedium
+        child: Column(
+          children: [
+            SizedBox(height: 16.0),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: features(context).length,
+                  itemBuilder: (context, index) {
+                    final feature = features(context)[index];
+                    return _buildFeatureCard(
+                      context,
+                      title: feature['title']!,
+                      imagePath: feature['imagePath']!,
+                      onTap: feature['onTap'],
+                    );
+                  },
+                ),
               ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DetailsPage(title: 'VR')),
-                      );
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(4), // Padding for the border
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.teal, // Teal-colored border
-                              width: 4.0,        // Border width
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: AssetImage('assets/vr_icon.png'), // VR icon
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'VR',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DetailsPage(title: 'Visual Search')),
-                      );
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(4), // Padding for the border
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.teal, // Teal-colored border
-                              width: 4.0,        // Border width
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: AssetImage('assets/visual_search_icon.png'), // Visual search icon
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Visual Search',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DetailsPage(title: 'Products')),
-                      );
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(4), // Padding for the border
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.teal, // Teal-colored border
-                              width: 4.0,        // Border width
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: AssetImage('assets/product_icon.png'), // Product icon
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Products',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  AppBar _customAppBar() {
+    return AppBar(
+      title: Text(
+        'Urbanic Categories',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 22,
+        ),
+      ),
+      centerTitle: true,
+      elevation: 5,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.teal.shade300, Colors.teal.shade600],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildFeatureCard(BuildContext context,
+      {required String title, required String imagePath, required VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 5,
+        shadowColor: Colors.teal.shade200,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_circle,
+                    color: Colors.teal.shade600,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> features(BuildContext context) {
+    return [
+      {
+        'title': 'Add Kurta Sets',
+        'imagePath': 'assets/kse.jpg',
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminUploadPage (),
+            ),
+          );
+        },
+      },
+      {
+        'title': 'Add Kurtis',
+        'imagePath': 'assets/kr.jpg',
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>  AdminUploadPage (),
+            ),
+          );
+        },
+      },
+      {
+        'title': 'Add Anarkali Suit',
+        'imagePath': 'assets/an.jpg',
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>  AdminUploadPage (),
+            ),
+          );
+        },
+      },
+      {
+        'title': 'Add Clothes Material',
+        'imagePath': 'assets/f.jpg',
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminUploadPage (),
+            ),
+          );
+        },
+      },
+    ];
   }
 }
 
@@ -178,120 +194,57 @@ class AdminDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.teal,
-            ),
-            child: Text(
-              'Admin Menu',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.teal.shade50, Colors.teal.shade300],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.teal.shade300, Colors.teal.shade600],
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  'Admin Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.rate_review),
-            title: Text('Customer Reviews'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage(title: 'Customer Reviews')),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.production_quantity_limits),
-            title: Text('Product Management'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage(title: 'Product Management')),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.shopping_bag),
-            title: Text('Order Management'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage(title: 'Order Management')),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Customer Management'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage(title: 'Customer Management')),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.payment),
-            title: Text('Payment Management'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage(title: 'Payment Management')),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('System Settings'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage(title: 'System Settings')),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app),
-            title: Text('Logout'),
-            onTap: () {
-              // Implement logout functionality
-            },
-          ),
-        ],
+            _buildDrawerTile(context, 'Customer Reviews', Icons.star),
+            _buildDrawerTile(context, 'Product Management', Icons.inventory),
+            _buildDrawerTile(context, 'Order Management', Icons.shopping_bag),
+            _buildDrawerTile(context, 'Customer Management', Icons.people),
+            _buildDrawerTile(context, 'System Settings', Icons.settings),
+            _buildDrawerTile(context, 'Logout', Icons.logout),
+          ],
+        ),
       ),
     );
   }
-}
 
-class DetailsPage extends StatelessWidget {
-  final String title;
-
-  DetailsPage({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.teal, // Set AppBar background color to teal
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/cs.jpg'), // Your background image
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            'Details for $title',
-            style: TextStyle(fontSize: 24, color: Colors.white),
-          ),
+  ListTile _buildDrawerTile(BuildContext context, String title, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.teal.shade600),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
         ),
       ),
+      onTap: () {},
     );
   }
 }
